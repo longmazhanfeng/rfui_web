@@ -2,7 +2,7 @@
 RFUI平台化尝试，使用Django框架搭建
 ## Getting Started
 - **本地Python环境**：
-更详细的配置请看[Eclipse Python开发环境搭建](rfui_web/others.md)
+更详细的配置请看[Eclipse Python开发环境搭建](https://github.com/longmazhanfeng/rfui_web/blob/master/others.md)
 
 ```
 pip install virtualenv
