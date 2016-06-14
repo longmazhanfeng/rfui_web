@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from myaccoutsite.models import Project, RFUser
+from myaccoutsite.models import BFile, RFUser, Folder, Project
 # process utf-8 file
 import codecs
 import json
@@ -12,19 +12,19 @@ def homepage(request):
 		# get authenticated rfuser
 		rfuser = RFUser.objects.filter(user=request.user)[0]
 		# show info of current user
-		project_list = rfuser.project_set.all().order_by('project_name')
-# 		project_list = RFUser.objects.filter(user=request.user).order_by('project_name')
-		context_dict = {'projects': project_list}
+		file_list = rfuser.bfile_set.all().order_by('file_name')
+# 		file_list = RFUser.objects.filter(user=request.user).order_by('file_name')
+		context_dict = {'files': file_list}
 		return render(request, 'homepage.html', context_dict)
 	else:
 		return render(request, 'homepage.html')
 	
-def bpmnpage(request, project_name_slug):
+def bpmnpage(request, file_name_slug):
 	# get authenticated rfuser
 	rfuser = RFUser.objects.filter(user=request.user)[0]
-	# get chosen project	
-	project = rfuser.project_set.all().filter(slug=project_name_slug)[0]
-	file_save = project.file_save
+	# get chosen file	
+	file = rfuser.bfile_set.all().filter(slug=file_name_slug)[0]
+	file_save = file.file_save
 	# utf-8 file read
 	file_bpmn = codecs.open(file_save.path, 'r', 'utf-8')
 	try:
@@ -37,7 +37,7 @@ def bpmnpage(request, project_name_slug):
 	# process the dict data
 	return render(request, 'bpmnpage.html', {'Dict': json.dumps(context_dict)})
 
-def savejson(request, project_name_slug):
+def savejson(request, file_name_slug):
 	if request.is_ajax():
 		if request.method == 'POST':
 			# decode bytes http data to json format
@@ -47,9 +47,9 @@ def savejson(request, project_name_slug):
 			
 			# get authenticated rfuser
 			rfuser = RFUser.objects.filter(user=request.user)[0]
-			# get chosen project	
-			project = rfuser.project_set.all().filter(slug=project_name_slug)[0]
-			file_save = project.file_save
+			# get chosen file	
+			file = rfuser.bfile_set.all().filter(slug=file_name_slug)[0]
+			file_save = file.file_save
 			# utf-8 file write
 			file_bpmn = codecs.open(file_save.path, 'w', 'utf-8')
 			try:
@@ -58,3 +58,27 @@ def savejson(request, project_name_slug):
 			finally:
 				file_bpmn.close()
 	return HttpResponse("OK")
+
+def testpage(request):
+	folders = Folder.objects.all()
+	for folder in folders:
+		if folder.parent_id == None:
+			tree_root = folder
+			break
+# 	print(json.dumps(get_folder(tree_root)))
+	return render(request, 'pm_homepage.html', {'tree_json': json.dumps(get_folder(tree_root))})
+
+# use recurion get jstree tree-format json data from database 
+def get_folder(folder):
+	root = {}
+	root['id'] = folder.folder_id
+	root['text'] = folder.folder_name
+	children = Folder.objects.filter(parent_id=folder.folder_id)
+	if children:
+		root_children = []
+		for child in children:
+			root_children.append(get_folder(child))
+		root['children'] = root_children
+	return root
+		
+			

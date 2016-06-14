@@ -14,7 +14,7 @@ const gulp = require('gulp');
  */
 const tasks = require(path.resolve(__dirname, 'gulp/tasks'));
 const config = require(path.resolve(__dirname, 'gulp/config'));
-// console.log(config);
+// console.log(tasks);
 
 /**
  * Tasks
@@ -35,33 +35,29 @@ gulp.task('build:js', function buildJS() {
         .pipe(gulp.dest(config.scripts.dist));
 });
 
-// only for bpmnshow.js
+//browserify deal with bpmnshow.js and editbpmn.js
 gulp.task('build:bpmnjs', function buildJS() {
-    return tasks.browserify(config.scripts.bpmnjs, {
-            debug: true,
-            list: true,
-            // make sure we do not include browser shims unnecessarily
-            insertGlobalVars: {
-                process: function() {
-                    return 'undefined';
+    var entries = [config.scripts.bpmnjs, config.scripts.editbpmn];
+    var stream;
+    for (var entry of entries) {
+        stream = tasks.browserify(entry, {
+                debug: true,
+                list: true,
+                // make sure we do not include browser shims unnecessarily
+                insertGlobalVars: {
+                    process: function() {
+                        return 'undefined';
+                    },
+                    Buffer: function() {
+                        return 'undefined';
+                    }
                 },
-                Buffer: function() {
-                    return 'undefined';
-                }
-            },
-            transform: ['brfs']
-        })
-        .pipe(gulp.dest(config.scripts.dist));
+                transform: ['brfs']
+            })
+            .pipe(gulp.dest(config.scripts.dist));
+    };
+    return stream;
 });
-
-// necessary task for bpmnshow.js
-// gulp.task('build:browserify', function buildBrowserify() {
-// return browserify('./static/src/js/bpmnshow.js')
-// .bundle()
-// .pipe(source('bundle.js'))
-// .pipe(gulp.dest(config.scripts.dist));
-// });
-
 
 gulp.task('manifest', function manifest() {
     return tasks.rev(config.manifest.source)
@@ -80,14 +76,23 @@ gulp.task('build:copy-images', function() {
 gulp.task('build:copy-less', function() {
     return tasks.copy(config.less.sources).pipe(gulp.dest(config.less.dist));
 });
+gulp.task('build:copy-scripts', function() {
+    return tasks.copy(config.scripts.copy_sources).pipe(gulp.dest(config.scripts.copyto_dist));
+});
 
+// build 3 JavaScript files
 gulp.task('build:script-include', function() {
-    // tasks.handlebars(config.templates.manifestPath, config.templates.bpmn_scriptsTemplate, config.staticUrlRoot)
-    //     .pipe(gulp.dest(config.templates.bpmn_des));
-    tasks.handlebars(config.templates.manifestPath, config.templates.bpmn_scriptsTemplate, config.staticUrlRoot)
-        .pipe(gulp.dest(config.templates.destination));  
-    return tasks.handlebars(config.templates.manifestPath, config.templates.scriptsTemplate, config.staticUrlRoot)
-        .pipe(gulp.dest(config.templates.destination));    
+    var args = [
+        [config.templates.edit_scriptsTemplate, config.templates.bpmn_des],
+        [config.templates.bpmn_scriptsTemplate, config.templates.destination],
+        [config.templates.scriptsTemplate, config.templates.destination]
+    ];
+    var stream;
+    for (var i = args.length - 1; i >= 0; i--) {
+        stream = tasks.handlebars(config.templates.manifestPath, args[i][0], config.staticUrlRoot)
+            .pipe(gulp.dest(args[i][1]));
+    };
+    return stream;
 });
 
 gulp.task('build:style-include', function() {
@@ -125,8 +130,7 @@ gulp.task('optimize:css', function() {
  */
 gulp.task('watch', function watch() {
     gulp.watch(config.watch.styles, gulp.series(['build:styles', 'manifest', 'build:style-include']));
-    gulp.watch(config.watch.scripts, gulp.series(['build:js', 'manifest', 'build:script-include']));
-    gulp.watch(config.watch.scripts, gulp.series(['build:bpmnjs', 'manifest', 'build:script-include']));
+    gulp.watch(config.watch.scripts, gulp.series(['build:js', 'build:bpmnjs', 'manifest', 'build:script-include']));
 });
 
 gulp.task('build', gulp.series([
@@ -138,7 +142,8 @@ gulp.task('build', gulp.series([
         'build:bpmnjs',
         'build:copy-icons',
         'build:copy-images',
-        'build:copy-less'
+        'build:copy-less',
+        'build:copy-scripts'
     ]),
     'manifest',
     'build:script-include',

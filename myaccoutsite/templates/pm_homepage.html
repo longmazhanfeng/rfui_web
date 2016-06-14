@@ -1,0 +1,32 @@
+{% extends "site_base.html" %} {% load i18n %} {% block head_title %}pinax-project-account{% endblock %} {% block body_class %}home{% endblock %} 
+
+{% block body_base %}
+
+{% block scripts %}
+    <script src='/site_media/static/js/jquery.min.js'></script>
+	<script src='/site_media/static/js/jstree.min.js'></script>
+{% endblock %}
+
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span4">
+			<div id="container">		
+			</div>
+		</div>
+		<div calss="span8"></div>
+	</div>
+</div>	
+
+<script>
+var tree_json = {{tree_json|safe}};
+
+$(function() {
+	$('#container').jstree({
+		'core': {
+			'data': tree_json
+		}
+	});
+});
+</script>
+
+{% endblock %}

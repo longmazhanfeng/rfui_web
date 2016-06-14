@@ -36,7 +36,7 @@ def bpmn_editpage(request, project_str):
 #         pprint(p)   
         # if the number of local files is out of 500, throw a error message 
         if len(os.listdir(bpmnfile_path)) > 500:
-            return render(request, 'bpmnpage.html', {'Dict': json.dumps(error_msg)})
+            return render(request, 'editpage.html', {'Dict': json.dumps(error_msg)})
 
         # use tempfile which will be automatically cleaned up
         temp = tempfile.TemporaryFile(mode='w+t')
@@ -55,7 +55,7 @@ def bpmn_editpage(request, project_str):
         file_bpmn.close()    
     
     # process the dict data
-    return render(request, 'bpmnpage.html', {'Dict': json.dumps(context_dict)})
+    return render(request, 'editpage.html', {'Dict': json.dumps(context_dict)})
 
 def savebpmn(request, project_str):
     if request.is_ajax():

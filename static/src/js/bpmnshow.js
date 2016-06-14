@@ -12,14 +12,13 @@ var canvas = $('#js-canvas');
 
 var bpmnModeler = new BpmnModeler({
 	container : canvas,
-//	propertiesPanel : {
-//		parent : '#js-properties-panel'
-//	},
-	// propertiesPanelModule, propertiesProviderModule,
-	additionalModules : [ cliModule ],
-//	moddleExtensions : {
-//		camunda : camundaModdleDescriptor
-//	},
+	propertiesPanel : {
+		parent : '#js-properties-panel'
+	},	 
+	additionalModules : [ propertiesPanelModule, propertiesProviderModule, cliModule ],
+	moddleExtensions : {
+		camunda : camundaModdleDescriptor
+	},
 	cli : {
 		bindTo : 'cli'
 	}

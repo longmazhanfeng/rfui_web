@@ -15,6 +15,7 @@ const tasks = [
   'clean',
   'css',
   'browserify',
+  'browserifies',
   'test',
   'xo',
   'rev',

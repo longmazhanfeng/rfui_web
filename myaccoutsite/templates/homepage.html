@@ -2,13 +2,13 @@
 
 {% if user.is_authenticated %}
 <div class="row">
-	{% if projects %}
-	{% for project in projects %}
+	{% if files %}
+	{% for file in files %}
 	<div class="col-xs-6 col-lg-4">
 		<h2>{{project.project_name}}</h2>
 		<img width="400" src="../site_media/media/a.png" />
 		<p>
-			<a class="btn btn-default" href="details/{{project.slug}}" role="button">View details »</a>
+			<a class="btn btn-default" href="details/{{file.slug}}" role="button">View details »</a>
 		</p>
 	</div>
 	{% endfor %}

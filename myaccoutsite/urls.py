@@ -8,13 +8,14 @@ from myaccoutsite import views
 
 
 urlpatterns = [
-    url(r"^$", views.homepage, name="home"),
+#     url(r"^$", views.homepage, name="home"),
+    url(r"^$", views.testpage, name="home"),
     url(r"^admin/", include(admin.site.urls)),
     url(r"^account/", include("account.urls")),
     # bpmn app urls 
     url(r"^bpmn/", include("bpmn.urls")),
-    url(r"^details/(?P<project_name_slug>[\w\-]+)/$", views.bpmnpage, name="details_bpms"),
-    url(r"^details/(?P<project_name_slug>[\w\-]+)/savejson/", views.savejson, name="savejson"),
+    url(r"^details/(?P<file_name_slug>[\w\-]+)/$", views.bpmnpage, name="details_bpms"),
+    url(r"^details/(?P<file_name_slug>[\w\-]+)/savejson/", views.savejson, name="savejson"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
