@@ -14,7 +14,7 @@
     "bootstrap": "^3.3.6",
     "bpmn-js": "^0.14.1",
     "font-awesome": "^4.5.0",
-    "jquery": "^2.1.4",
+    "jquery": "^3.5.0",
     "bpmn-js-properties-panel": "^0.6.0",
     "camunda-bpmn-moddle": "^0.2.5",
     "diagram-js": "^0.14.0",
